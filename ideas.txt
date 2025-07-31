@@ -1,0 +1,58 @@
+- Adversarial training
+class DomainAgnosticTraining:
+    def __init__(self, feature_extractor, classifier, domain_discriminator):
+        self.feature_extractor = feature_extractor
+        self.classifier = classifier  
+        self.domain_discriminator = domain_discriminator
+    
+    def train_step(self, batch):
+        # Extract features
+        features = self.feature_extractor(batch.images)
+        
+        # Classification loss (main task)
+        class_pred = self.classifier(features)
+        class_loss = F.cross_entropy(class_pred, batch.labels)
+        
+        # Domain discrimination loss (try to identify synthetic domains)
+        domain_pred = self.domain_discriminator(features.detach())
+        domain_loss = F.cross_entropy(domain_pred, batch.synthetic_domain_labels)
+        
+        # Adversarial loss (make features domain-agnostic)
+        adversarial_loss = -F.cross_entropy(
+            self.domain_discriminator(features), 
+            batch.synthetic_domain_labels
+        )
+        
+        # Combined loss
+        total_loss = class_loss + 0.1 * adversarial_loss
+        return total_loss
+
+- Data Augmentation
+synthetic_domains = {
+    'bright_lighting': ColorJitter(brightness=0.3, contrast=0.1),
+    'dim_lighting': ColorJitter(brightness=-0.2, contrast=0.2), 
+    'warm_tone': ColorJitter(hue=0.1, saturation=0.2),
+    'cool_tone': ColorJitter(hue=-0.1, saturation=0.2),
+    'sharp': RandomAdjustSharpness(2.0),
+    'soft': GaussianBlur(kernel_size=3),
+    'noisy': Lambda(lambda x: x + torch.randn_like(x) * 0.01)
+}
+rotation as well probably
+cropping as well since images sometimes only have the top part
+add texture to the background of the train images
+Mixup	Cutmix	RandAugment
+v2.RandomResizedCrop(size[, scale, ratio, ...]) (low resolution image and only a part of it)
+Random crop (full resolution image but ony a part of it=
+v2.RandomRotation(degrees[, interpolation, ...]) (careful with the back areas added)
+RandomPerspective (careful with the back areas added)
+Grayscale (color agnostic features?)
+
+-Style Transfer  scrap the internet to get real images and apply statistical target estimation
+
+- apply l2 normalization or information bottleneck to the features
+
+- cross validation, if the model generalizes well within the synthetic data, it is a good sign already
+
+- if multiple classes have similar confidence, don't classify
+
+- use a contrastive learning approach

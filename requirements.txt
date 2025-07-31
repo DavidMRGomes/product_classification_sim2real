@@ -1,0 +1,15 @@
+# CUDA 12.1-compatible PyTorch (latest stable)
+torch==2.2.2+cu121
+torchvision==0.17.2+cu121
+torchaudio==2.2.2+cu121
+-f https://download.pytorch.org/whl/torch_stable.html
+
+# Core dependencies
+numpy
+pillow
+matplotlib
+seaborn
+pandas
+scikit-learn
+tqdm
+jupyter

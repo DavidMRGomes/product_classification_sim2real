@@ -1,0 +1,68 @@
+# Base Configuration for Product Classification Training
+
+# Model Configuration
+model:
+  backbone: "resnet18"  # Options: resnet18, resnet50, vgg16, efficientnet_b0, mobilenet_v3
+  num_classes: null  # Will be inferred from dataset
+  pretrained: true
+  feature_dim: null  # Will be inferred from backbone
+  
+  # Domain-robust architecture components
+  use_batch_norm: false
+  use_l2_norm: false
+  dropout_rate: 0.0
+
+# Training Configuration
+training:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  
+  # Optimizer settings
+  optimizer: "adam"  # Options: adam, sgd, adamw
+  scheduler: "step"  # Options: step, cosine, none
+  step_size: 20      # For step scheduler
+  gamma: 0.1         # For step scheduler
+  
+  # Early stopping
+  patience: 10
+  min_delta: 0.001
+
+  # Loss method
+  loss_method: "cross_entropy"
+
+# Data Configuration
+data:
+  data_dir: "data"
+  train_dir: "train"
+  val_dir: "validation"
+  num_workers: 4
+  pin_memory: true
+
+# Augmentation Configuration
+augmentation:
+  type: "standard"  # Options: standard, basic, domain_randomization, progressive, coral_adapted
+
+# Domain Adaptation Configuration
+domain_adaptation:
+  enabled: false
+
+# Regularization
+regularization:
+  feature_diversity_loss: false
+
+# Logging and Checkpoints
+logging:
+  log_interval: 10  # Log every N batches
+  save_model: true
+  checkpoint_dir: "checkpoints"
+  save_best_only: true
+
+# Device Configuration
+device:
+  type: "auto"  # Options: auto, cpu, cuda, mps
+  gpu_id: 0     # For multi-GPU setups
+
+# Random Seeds
+seed: 42
